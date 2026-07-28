@@ -551,17 +551,42 @@ a.entry:focus-visible .entry-open { color: var(--magenta); }
    plaintext would flash up for a frame before being encrypted. */
 html[data-js] [data-seal]:not([data-state]) { visibility: hidden; }
 
+/* `word-break` is what stops the page shuffling under a run. A sweep rewrites
+   characters but never the character count, and whitespace stays put, so in a
+   monospace face the one thing left that can move is where the lines break —
+   and the glyph vocabulary is nearly all punctuation. `-`, `/`, `]`, `}` and
+   friends each hand the browser a fresh place it's allowed to wrap, re-rolled
+   sixty times a second, so a line sitting near the column limit flickers
+   between one row and two and shoves everything below it up and down. keep-all
+   withdraws the offer: lines break at spaces, which the cipher preserves
+   exactly, and nowhere else — which also means the sealed text and the
+   plaintext wrap identically, so nothing shifts when a run settles either.
+   break-word is the escape hatch for a word too long for the column; it's
+   driven by width alone, so it lands on the same character in both states.
+
+   Both properties inherit, so the region sets them once for every block inside
+   it — and from the first paint, rather than from whenever the JS lands. */
+[data-seal] {
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
 /* scrambled / decrypting text: mauve while sealed, full-strength once open.
    the fade is slower than the sweep, so a run finishes assembling just as it
-   finishes brightening. */
-/* `contain` is the load-bearing part here: rewriting a block's text several
-   times a second would otherwise let the browser reconsider the layout of
-   everything around it on every frame. the character count never changes and
-   the font is monospace, so a scrambling block can't actually move anything —
-   this is how you say so. */
+   finishes brightening.
+
+   `contain` keeps the repaint local: rewriting a block's text several times a
+   second would otherwise let the browser reconsider the layout of everything
+   around it on every frame. It goes on the blocks cipher.js splits a region
+   into — the same list — and not on the region around them, since containing
+   that would stop the last block's margin collapsing through it and change the
+   page's spacing. */
 .cipher,
 .transmission-body p,
-.transmission-body li {
+.transmission-body li,
+.transmission-body h2,
+.transmission-body h3,
+.transmission-body blockquote {
   contain: layout style;
   transition: color 600ms linear;
 }
