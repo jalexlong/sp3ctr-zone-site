@@ -6,6 +6,11 @@ module.exports = function (eleventyConfig) {
   eleventyConfig.addPassthroughCopy("favicon.svg");
   eleventyConfig.addPassthroughCopy("favicon.ico");
 
+  // Neocities serves a default robots.txt that the build knew nothing about, so
+  // a pruning deploy would have deleted it off the live site. It lives here now:
+  // version-controlled, editable, and reproduced by every build.
+  eleventyConfig.addPassthroughCopy("robots.txt");
+
   // Frontmatter dates parse as UTC midnight, so format with UTC getters —
   // using local getters here would roll the date back a day in some timezones.
   eleventyConfig.addFilter("dateDisplay", (date) => {
