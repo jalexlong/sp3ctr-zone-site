@@ -2,8 +2,8 @@
 // Every [data-seal] region ships to the browser as ordinary readable HTML and
 // gets sealed the instant this script runs, so a visitor without JS still gets
 // the transmission. On the log page a sealed preview decrypts while its entry is
-// hovered or focused and re-seals when you leave; on a transmission's own page
-// the body decrypts itself on arrival and stays open.
+// hovered, focused, or tapped and re-seals when you leave; on a transmission's
+// own page the body decrypts itself on arrival and stays open.
 // depends on site.js, loaded first.
 
 document.querySelectorAll("[data-seal]").forEach((region) => {
@@ -67,4 +67,33 @@ document.querySelectorAll("[data-seal]").forEach((region) => {
   trigger.addEventListener("mouseleave", seal);
   trigger.addEventListener("focus", () => decrypt());
   trigger.addEventListener("blur", seal);
+
+  // A touchscreen has no hover to enter or leave. What looks like a press —
+  // the tap highlight — fires no event of its own, and the browser only
+  // synthesizes mouseenter at the *end* of the tap, an instant before it
+  // follows the link, so the decrypt would never be seen. A finger gets the
+  // two-step instead: the first tap decrypts the preview where it stands, the
+  // second one opens the transmission.
+  let byTouch = false;
+  let wasSealed = false;
+
+  trigger.addEventListener("pointerdown", (event) => {
+    byTouch = event.pointerType !== "mouse";
+    // Whether the preview was already open has to be read as the finger lands:
+    // by the time the click arrives the tap's own synthetic hover may have
+    // decrypted it, which would make every first tap look like a second one.
+    wasSealed = region.dataset.state === "cipher";
+  });
+
+  trigger.addEventListener("click", (event) => {
+    if (!byTouch || !wasSealed) return;
+    event.preventDefault();
+    decrypt();
+  });
+
+  // Nothing tells a touchscreen you've stepped away, so the reseal has to come
+  // from the next tap landing somewhere else on the page.
+  document.addEventListener("pointerdown", (event) => {
+    if (event.pointerType !== "mouse" && !trigger.contains(event.target)) seal();
+  });
 });
