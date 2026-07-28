@@ -1,0 +1,19 @@
+---
+layout: _layouts/base.njk
+extraScripts:
+  - /js/cipher.js
+---
+<article class="transmission">
+  <div class="entry-head">
+    <span class="entry-date">{{ page.date | dateDisplay }}</span>
+    <span class="entry-tag">INBOUND TRANSMISSION</span>
+  </div>
+  <h1>{{ title }}</h1>
+
+  {# arriving here is the key: the body decrypts itself, in order, on load. #}
+  <div class="transmission-body" data-seal data-decrypt-on-load>
+    {{ content | safe }}
+  </div>
+
+  <p class="prompt"><a href="/transmissions/">back to the log</a></p>
+</article>

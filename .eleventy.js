@@ -14,6 +14,23 @@ module.exports = function (eleventyConfig) {
     return `${d.getUTCFullYear()}.${pad(d.getUTCMonth() + 1)}.${pad(d.getUTCDate())}`;
   });
 
+  // A transmission's opening paragraph doubles as its preview in the log, so
+  // the index never restates copy that already lives in the entry itself. This
+  // runs on rendered markdown, hence unpicking the tags and entities markdown-it
+  // put in; the newlines collapse because a preview is always one line.
+  const ENTITIES = { amp: "&", lt: "<", gt: ">", quot: '"', "#39": "'", nbsp: " " };
+
+  eleventyConfig.addFilter("firstParagraph", (content) => {
+    const html = String(content ?? "");
+    const paragraph = html.match(/<p>([\s\S]*?)<\/p>/i);
+
+    return (paragraph ? paragraph[1] : html)
+      .replace(/<[^>]+>/g, "")
+      .replace(/&(#?\w+);/g, (entity, name) => ENTITIES[name] ?? entity)
+      .replace(/\s+/g, " ")
+      .trim();
+  });
+
   return {
     dir: {
       input: "src",

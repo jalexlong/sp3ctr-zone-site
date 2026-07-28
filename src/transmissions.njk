@@ -1,23 +1,26 @@
 ---
 layout: _layouts/base.njk
 section: transmissions
-description: Sealed transmissions from sp3ctr-zone. Hover or focus an entry to decrypt it.
+description: Sealed transmissions from sp3ctr-zone. Hover an entry to decrypt the preview, open it for the rest.
 extraScripts:
-  - /js/transmissions.js
+  - /js/cipher.js
 ---
 <h1>transmissions</h1>
-<p class="prompt">newest first. hover or tab to an entry to decrypt it —
-  step away and it reseals.</p>
+<p class="prompt">newest first. hover or tab to an entry to decrypt its opening
+  line — step away and it reseals. open one to read the whole thing.</p>
 
 <div class="log">
   <div class="signal"><span class="signal-dot" aria-hidden="true"></span> SIGNAL LOCKED &middot; {{ collections.transmissions.length }} TRANSMISSIONS ON FILE</div>
 {% for entry in collections.transmissions | reverse %}
-  <article class="entry">
-    <div class="entry-head">
+  <a class="entry" href="{{ entry.url }}" data-cipher-trigger>
+    <span class="entry-head">
       <span class="entry-date">{{ entry.date | dateDisplay }}</span>
       <span class="entry-subject">{{ entry.data.title }}</span>
-    </div>
-    <p class="cipher" tabindex="0" data-plain="{{ entry.data.message }}">[ sealed ]</p>
-  </article>
+    </span>
+    {# only the opening paragraph is on this page at all — the rest of the
+       transmission exists solely on its own page. #}
+    <span class="cipher" data-seal>{{ entry.templateContent | firstParagraph }}</span>
+    <span class="entry-open" aria-hidden="true">open transmission</span>
+  </a>
 {% endfor %}
 </div>

@@ -41,7 +41,7 @@ const HOME = {
       content: [
         "elsewhere on this node:",
         "",
-        "  /transmissions/   sealed entries, decrypt on hover",
+        "  /transmissions/   sealed entries, open one to decrypt it",
         "  /tools/           client-side cipher toolkit",
         "  /about/           who runs this thing",
         "",

@@ -8,6 +8,21 @@
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="alternate icon" href="/favicon.ico" sizes="16x16 32x32 48x48 64x64">
   <link rel="stylesheet" href="/css/style.css">
+  {# two things have to be settled before the first paint, which is why this is
+     inline rather than in site.js. sealed text ships as real text in the HTML so
+     it still reads with JS off, and this flag lets the stylesheet hide those
+     regions in browsers that *do* have JS until the scrambler seals them. and a
+     visitor who switched the tube off should never see a frame of it flicker
+     back on. localStorage throws in some privacy modes — the tube staying on is
+     a fine outcome there, so the failure is swallowed. #}
+  <script>
+    document.documentElement.dataset.js = "on";
+    try {
+      if (localStorage.getItem("sp3ctr:crt") === "off") {
+        document.documentElement.dataset.crt = "off";
+      }
+    } catch (e) {}
+  </script>
 </head>
 <body>
   <div class="boot-flash" aria-hidden="true"></div>
@@ -18,21 +33,30 @@
   <div class="terminal">
     <div class="titlebar">
       <span class="glitch" data-text="sp3ctr-zone :: {{ section }}">sp3ctr-zone :: {{ section }}</span>
-      <span data-clock>00:00:00</span><span class="caret"></span>
+      {# the label is filled in by site.js from the stored preference; it ships
+         as ON because that's the default the stylesheet renders. #}
+      <button class="crt-toggle" type="button" data-crt-toggle aria-pressed="true">CRT: ON</button>
+      <span data-clock>--- 00:00:00</span>
     </div>
 
     <nav class="menu" aria-label="site">
-      <a href="/" {% if page.url == "/" %}aria-current="page"{% endif %}>index</a>
+      <a href="/" {% if page.url == "/" %}aria-current="page"{% endif %}>root</a>
       <a href="/transmissions/" {% if page.url == "/transmissions/" %}aria-current="page"{% endif %}>transmissions</a>
       <a href="/tools/" {% if page.url == "/tools/" %}aria-current="page"{% endif %}>tools</a>
       <a href="/webshell/" {% if page.url == "/webshell/" %}aria-current="page"{% endif %}>webshell</a>
       <a href="/about/" {% if page.url == "/about/" %}aria-current="page"{% endif %}>about</a>
     </nav>
 
+    {# the track holds two byte-identical copies of the phrase list and scrolls
+       exactly -50%, so the loop restarts on a frame that looks the same as the
+       one before it. keep the copies identical or the seam will visibly jump.
+       the trailing gap is &nbsp; because the track is a flex container: that
+       blockifies the spans, and a plain trailing space would be trimmed as
+       end-of-line whitespace, butting "CARRIER" against the last dot. #}
     <div class="ticker" aria-hidden="true">
       <div class="ticker-track">
-        <span>CARRIER DETECTED &middot; ENCRYPTION NOMINAL &middot; NODE UPTIME STABLE &middot; TRUST NO CLEARNET &middot; SIGNAL PERSISTS &middot; </span>
-        <span>CARRIER DETECTED &middot; ENCRYPTION NOMINAL &middot; NODE UPTIME STABLE &middot; TRUST NO CLEARNET &middot; SIGNAL PERSISTS &middot; </span>
+        <span>TCP HANDSHAKE COMPLETE &middot; ENCRYPTING PACKET STREAM &middot; STABLIZING LATENCY JITTER &middot; MONITORING SYSTEM RESOURCES &middot; ALL SYSTEMS NOMINAL &middot; REFRESHING TCP STREAM &middot;&nbsp;</span>
+        <span>TCP HANDSHAKE COMPLETE &middot; ENCRYPTING PACKET STREAM &middot; STABLIZING LATENCY JITTER &middot; MONITORING SYSTEM RESOURCES &middot; ALL SYSTEMS NOMINAL &middot; REFRESHING TCP STREAM &middot;&nbsp;</span>
       </div>
     </div>
 
@@ -42,6 +66,7 @@
 
     <footer class="statusline">
       <span>STATUS: <span style="color:var(--magenta)">online</span></span>
+      <span>BUILT WITH <a href="https://www.11ty.dev/">11ty</a></span>
       <span>NODE: sp3ctr-zone</span>
     </footer>
   </div>
