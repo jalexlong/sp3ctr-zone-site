@@ -6,6 +6,7 @@
     "clean": "node -e \"require('node:fs').rmSync('_site', { recursive: true, force: true })\"",
     "build": "npm run clean && eleventy",
     "serve": "eleventy --serve",
+    "test": "node --test 'test/*.test.js'",
     "deploy": "npm run build && node deploy.mjs"
   },
   "author": "sp3ctr",
