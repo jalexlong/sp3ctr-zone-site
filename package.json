@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "build": "eleventy",
+    "clean": "node -e \"require('node:fs').rmSync('_site', { recursive: true, force: true })\"",
+    "build": "npm run clean && eleventy",
     "serve": "eleventy --serve",
     "deploy": "npm run build && node deploy.mjs"
   },

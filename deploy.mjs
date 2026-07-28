@@ -9,6 +9,14 @@
 // build no longer produces, or --dry-run to preview those deletions:
 //   npm run deploy -- --prune
 //   npm run deploy -- --prune --dry-run
+//
+// Everything in _site/ gets uploaded, whatever it is, so `npm run build` wipes
+// the directory before Eleventy writes to it. Eleventy doesn't clean up after
+// itself: without that, a file from an interrupted run — say a half-written
+// style.css.tmp.25561 — survives in the output forever and gets shipped, and
+// Neocities rejects unknown extensions outright, failing the deploy partway
+// through. It also means --prune's "the build no longer produces this" is
+// answered by an actual fresh build rather than by whatever was lying around.
 
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join, relative, sep } from "node:path";
