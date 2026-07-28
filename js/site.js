@@ -67,7 +67,13 @@ function pump(now) {
 // CHURN for a side that re-rolls every frame — and that churn is what makes a
 // stretch of text read as actively scrambling rather than merely wrong. When the
 // front runs off the end, the run snaps to `settle` and stops.
-function sweep(target, { shape, behind, ahead, settle, frame = 35, step = 2 }) {
+//
+// `until` cuts the run short: the front travels only that far, and everything
+// past it churns for the whole run whatever `ahead` says. That's for a sweep
+// taking back a stretch some earlier run only got partway through — the part it
+// never reached is left alone, still scrambling, rather than being painted with
+// an `ahead` that would give it away.
+function sweep(target, { shape, behind, ahead, settle, until = shape.length, frame = 35, step = 2 }) {
   sweeps.delete(target.run);
 
   if (prefersReducedMotion) {
@@ -86,11 +92,16 @@ function sweep(target, { shape, behind, ahead, settle, frame = 35, step = 2 }) {
     if (!/\s/.test(buffer[index])) movable.push(index);
   }
 
+  // How far into `movable` the front's stopping point reaches. Positions at or
+  // past it are outside this run entirely.
+  let limit = 0;
+  while (limit < movable.length && movable[limit] < until) limit++;
+
   // Frame zero: the front has covered nothing, so every position shows its
   // `ahead` value. When `ahead` is a fixed string, this is the only time those
   // positions are written at all.
-  for (const index of movable) {
-    buffer[index] = ahead === CHURN ? randomGlyph() : ahead[index];
+  for (let at = 0; at < movable.length; at++) {
+    buffer[movable[at]] = ahead === CHURN || at >= limit ? randomGlyph() : ahead[movable[at]];
   }
 
   let front = 0; // characters the front has covered
@@ -99,17 +110,22 @@ function sweep(target, { shape, behind, ahead, settle, frame = 35, step = 2 }) {
   const run = {
     frame,
     due: 0,
+    // How far the front got, for whatever run interrupts this one and has to
+    // know how much of it actually landed.
+    get reach() {
+      return front;
+    },
     advance() {
       front += step;
 
-      if (front >= shape.length) {
+      if (front >= until) {
         sweeps.delete(run);
         target.paint(settle);
         return;
       }
 
       const wasCrossed = crossed;
-      while (crossed < movable.length && movable[crossed] < front) crossed++;
+      while (crossed < limit && movable[crossed] < front) crossed++;
 
       // Only the churning side is rewritten each frame. A settled side gets
       // written once, as the front goes past it, and is then left alone.
@@ -120,8 +136,11 @@ function sweep(target, { shape, behind, ahead, settle, frame = 35, step = 2 }) {
       }
 
       if (ahead === CHURN) {
-        for (let at = crossed; at < movable.length; at++) buffer[movable[at]] = randomGlyph();
+        for (let at = crossed; at < limit; at++) buffer[movable[at]] = randomGlyph();
       }
+
+      // Past the front's stopping point nothing settles until the run is over.
+      for (let at = limit; at < movable.length; at++) buffer[movable[at]] = randomGlyph();
 
       target.paint(buffer.join(""));
     },
@@ -145,8 +164,20 @@ function decryptText(target, plain, options) {
 // churn *behind* it and leaves plaintext ahead, so the scramble spreads a
 // character at a time until the whole run is moving — and only once the front
 // has taken all of it does the text freeze into `cipher` and come to rest.
+//
+// Leaving mid-decrypt seals only as far as that decrypt got. Its plaintext side
+// would otherwise hand over the rest of the line on the way past — the reader
+// would see the end of a sentence they had walked away from before it arrived.
 function sealText(target, plain, cipher, options) {
-  sweep(target, { shape: plain, behind: CHURN, ahead: plain, settle: cipher, ...options });
+  const interrupted = sweeps.has(target.run) ? target.run.reach : plain.length;
+  sweep(target, {
+    shape: plain,
+    behind: CHURN,
+    ahead: plain,
+    settle: cipher,
+    until: interrupted,
+    ...options,
+  });
 }
 
 // How many characters the front should cover per frame for a run of `length` to

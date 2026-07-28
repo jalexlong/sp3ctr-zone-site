@@ -18,7 +18,10 @@ document.querySelectorAll("[data-seal]").forEach((region) => {
 
     target.paint(cipher);
     el.dataset.state = "cipher";
-    return { el, target, plain, cipher };
+    // `open` is the block's own business and can't be read off `el`: a region
+    // with no block children is its own single block, and the two would share
+    // one element's state.
+    return { el, target, plain, cipher, open: false };
   });
 
   // The stylesheet keeps the region invisible until it carries a state, so the
@@ -35,6 +38,7 @@ document.querySelectorAll("[data-seal]").forEach((region) => {
       // does — a block still waiting its turn in the cascade is still sealed.
       block.pending = setTimeout(() => {
         block.el.dataset.state = "plain";
+        block.open = true;
         decryptText(block.target, block.plain, { step: paceFor(block.plain.length, 70) });
       }, delay + index * stagger);
     });
@@ -45,8 +49,14 @@ document.querySelectorAll("[data-seal]").forEach((region) => {
     region.dataset.state = "cipher";
 
     blocks.forEach((block) => {
-      block.el.dataset.state = "cipher";
       clearTimeout(block.pending);
+      // A block whose turn in the cascade hadn't come round yet never left the
+      // ciphertext, so there is nothing here to take back — and running a seal
+      // over it would paint the plaintext first to have something to scramble.
+      if (!block.open) return;
+
+      block.open = false;
+      block.el.dataset.state = "cipher";
       sealText(block.target, block.plain, block.cipher, {
         step: paceFor(block.plain.length, 50),
       });
