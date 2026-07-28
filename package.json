@@ -1,0 +1,16 @@
+{
+  "name": "sp3ctr-zone-site",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "eleventy",
+    "serve": "eleventy --serve",
+    "deploy": "npm run build && node deploy.mjs"
+  },
+  "author": "sp3ctr",
+  "license": "ISC",
+  "description": "sp3ctr-zone — source for the Eleventy-built static site.",
+  "devDependencies": {
+    "@11ty/eleventy": "^3.1.6"
+  }
+}

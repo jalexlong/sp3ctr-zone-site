@@ -1,0 +1,60 @@
+---
+layout: _layouts/base.njk
+section: tools
+description: Client-side cipher toolkit from sp3ctr-zone. Nothing typed here leaves your browser.
+extraScripts:
+  - /js/tools.js
+---
+<h1>tools</h1>
+<p class="prompt">client-side only. nothing you type below leaves your
+  browser — there's no server to send it to. view-source and verify
+  that yourself, that's the point.</p>
+<p class="prompt">the moment a tool needs a server, it needs your trust
+  too — and servers get subpoenaed, sold, or breached. anything that
+  actually has to stay yours belongs on your own machine, not in someone
+  else's database.</p>
+
+<section class="panel">
+  <h2>cipher toolkit</h2>
+
+  <form id="cipher-form">
+    <div class="row">
+      <div class="field">
+        <label for="cipher-type">cipher</label>
+        <select id="cipher-type">
+          <option value="caesar">caesar shift</option>
+          <option value="vigenere">vigenère</option>
+          <option value="xor">xor (hex output)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="cipher-key"><span id="cipher-key-label">shift</span></label>
+        <input id="cipher-key" type="text" autocomplete="off" placeholder="e.g. 13">
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="cipher-message">message</label>
+      <textarea id="cipher-message" placeholder="type or paste here"></textarea>
+    </div>
+
+    <div class="actions">
+      <button type="submit" value="encrypt">encrypt</button>
+      <button type="submit" value="decrypt">decrypt</button>
+    </div>
+
+    <div class="field">
+      <label for="cipher-output">output</label>
+      <textarea id="cipher-output" readonly></textarea>
+    </div>
+    <div class="actions">
+      <button type="button" id="cipher-copy">copy output</button>
+    </div>
+  </form>
+
+  <p class="note">these are classic ciphers, kept around for learning and
+    for the vibe — not for real secrecy. a determined adversary breaks
+    caesar and vigenère by hand and xor with a short reused key almost
+    as fast. for anything that actually needs to stay secret, reach for
+    PGP, age, or Signal instead.</p>
+</section>

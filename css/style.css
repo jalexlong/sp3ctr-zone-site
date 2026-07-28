@@ -1,0 +1,552 @@
+/* sp3ctr-zone :: shared stylesheet
+   one file, no build step, no external fonts or CDNs — view-source and it's all here. */
+
+:root {
+  --void: #0b0710;      /* page background */
+  --panel: #16101f;     /* raised panel background */
+  --ash: #cbb8d6;       /* body text */
+  --mauve: #9c7a9e;     /* muted text, borders */
+  --magenta: #ff2ec4;   /* primary accent */
+  --violet: #7c3aed;    /* secondary accent */
+  --phosphor: #35e6ff;  /* CRT misconvergence sliver — glitch/chromatic-aberration duty only, never a UI color */
+  --alert: #ff4d6d;     /* shell errors only — the one warm note, kept in the pink family */
+
+  --mono: ui-monospace, "Cascadia Mono", "SFMono-Regular", "Consolas", "Courier New", monospace;
+  --glow: 0 0 8px rgba(255, 46, 196, 0.55);
+}
+
+* { box-sizing: border-box; }
+
+html { color-scheme: dark; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background:
+    radial-gradient(ellipse 70% 50% at 50% -10%, rgba(124, 58, 237, 0.25), transparent 60%),
+    radial-gradient(ellipse 70% 40% at 50% 110%, rgba(255, 46, 196, 0.18), transparent 60%),
+    var(--void);
+  background-attachment: fixed;
+  color: var(--ash);
+  font-family: var(--mono);
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+a {
+  color: var(--magenta);
+  text-decoration: none;
+  border-bottom: 1px dotted var(--magenta);
+}
+a:hover, a:focus-visible { text-shadow: var(--glow); }
+
+:focus-visible {
+  outline: 2px solid var(--magenta);
+  outline-offset: 2px;
+}
+
+/* scanlines + vignette sit ON TOP of everything, including the content —
+   at these strengths (4% white lines, vignette transparent at center)
+   that never hurts legibility, and it's what ties the content boxes to
+   the noisy atmosphere around them instead of the two looking like
+   separate layers. the static (below) is the one kept behind the
+   terminal, because at the strength that makes it feel alive, directly
+   over text it does hurt legibility. */
+.crt-overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 50;
+  background:
+    radial-gradient(ellipse at center, transparent 30%, rgba(0, 0, 0, 0.88) 100%),
+    repeating-linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.04) 0px,
+      rgba(255, 255, 255, 0.04) 1px,
+      transparent 1px,
+      transparent 3px
+    );
+  opacity: 0.9;
+}
+
+/* a soft bright band drifting down the screen, like a CRT's refresh sweep */
+.crt-overlay::after {
+  content: "";
+  position: absolute;
+  inset: -10% 0 auto 0;
+  height: 12%;
+  background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.05), transparent);
+  animation: sweep-drift 9s linear infinite;
+}
+@keyframes sweep-drift {
+  from { transform: translateY(-20%); }
+  to { transform: translateY(920%); }
+}
+
+.crt-noise {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  /* feTurbulence alone renders as multicolored, semi-transparent static —
+     the feColorMatrix forces every pixel to pure white and keeps only the
+     turbulence's alpha channel, so this reads as actual white noise. */
+  background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/><feColorMatrix type='matrix' values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 1 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  mix-blend-mode: screen;
+  opacity: 0.8;
+  animation: static-jitter 0.5s steps(1) infinite;
+}
+
+/* rapid, discrete jumps (not a smooth pan) so the grain reads as crawling
+   static rather than a slow drift. */
+@keyframes static-jitter {
+  0%   { background-position: 0 0; }
+  10%  { background-position: 37px 91px; }
+  20%  { background-position: -71px 13px; }
+  30%  { background-position: 12px -58px; }
+  40%  { background-position: 84px 34px; }
+  50%  { background-position: -29px 77px; }
+  60%  { background-position: 55px -12px; }
+  70%  { background-position: -46px 60px; }
+  80%  { background-position: 19px -83px; }
+  90%  { background-position: -63px 25px; }
+  100% { background-position: 0 0; }
+}
+
+/* synthwave horizon: a receding grid glowing at the bottom of the void.
+   fixed, low-opacity, no sun or palm trees — just the floor. */
+.grid-floor {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 42vh;
+  z-index: 1;
+  pointer-events: none;
+  background-image:
+    repeating-linear-gradient(to right, rgba(255, 46, 196, 0.4) 0 1px, transparent 1px 8.33%),
+    repeating-linear-gradient(to bottom, rgba(124, 58, 237, 0.45) 0 1px, transparent 1px 7%);
+  transform: perspective(280px) rotateX(62deg);
+  transform-origin: bottom center;
+  mask-image: linear-gradient(to top, black, transparent 85%);
+  -webkit-mask-image: linear-gradient(to top, black, transparent 85%);
+  opacity: 0.4;
+}
+
+/* CRT power-on: a bright line snaps open then fades, once per page load */
+.boot-flash {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: var(--ash);
+  pointer-events: none;
+  animation: boot-flash 650ms ease-out forwards;
+}
+@keyframes boot-flash {
+  0% { opacity: 1; transform: scaleY(0.01); }
+  18% { opacity: 1; transform: scaleY(1); }
+  45% { opacity: 0.7; transform: scaleY(1); }
+  100% { opacity: 0; transform: scaleY(1); }
+}
+
+/* the bezel: one glowing magenta frame hugging the stack directly — no
+   gap between it and the titlebar/nav/main/footer's own borders. the glow
+   is what carries the effect now, so it's allowed to bloom out wide. */
+.terminal {
+  position: relative;
+  z-index: 2;
+  max-width: 860px;
+  margin: 2.5rem auto;
+  padding: 0;
+  border: 2px solid var(--magenta);
+  box-shadow:
+    0 0 4px rgba(255, 46, 196, 0.9),
+    0 0 22px rgba(255, 46, 196, 0.6),
+    0 0 65px rgba(255, 46, 196, 0.35),
+    0 0 140px rgba(255, 46, 196, 0.2),
+    0 0 220px rgba(124, 58, 237, 0.12);
+}
+
+/* nothing inside the bezel draws its own frame. each section carries at most
+   a horizontal rule to separate it from the next, so the stack reads as one
+   continuous screen with dividers — the bezel is the only box. */
+
+.titlebar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.5rem 1rem;
+  background: var(--panel);
+  border: none;
+  border-bottom: 1px solid var(--mauve);
+  font-size: 0.8rem;
+  color: var(--mauve);
+}
+
+/* the recurring branded tic: a brief, low-amplitude RGB-split flicker on
+   the titlebar text, like a signal losing sync every few seconds. */
+.glitch {
+  position: relative;
+  display: inline-block;
+}
+.glitch::before,
+.glitch::after {
+  content: attr(data-text);
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+}
+.glitch::before {
+  color: var(--phosphor);
+  animation: glitch-a 7s infinite;
+}
+.glitch::after {
+  color: var(--magenta);
+  animation: glitch-b 7s infinite;
+}
+@keyframes glitch-a {
+  0%, 92%, 100% { opacity: 0; transform: translate(0, 0); clip-path: inset(0 0 100% 0); }
+  93% { opacity: 0.85; transform: translate(-2px, 1px); clip-path: inset(10% 0 60% 0); }
+  94.5% { opacity: 0.85; transform: translate(2px, -1px); clip-path: inset(45% 0 20% 0); }
+  96% { opacity: 0; }
+}
+@keyframes glitch-b {
+  0%, 90%, 100% { opacity: 0; transform: translate(0, 0); clip-path: inset(0 0 100% 0); }
+  91% { opacity: 0.8; transform: translate(2px, -1px); clip-path: inset(55% 0 5% 0); }
+  92.5% { opacity: 0.8; transform: translate(-2px, 1px); clip-path: inset(5% 0 75% 0); }
+  94% { opacity: 0; }
+}
+
+nav.menu {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 0.75rem;
+  list-style: none;
+  margin: 0;
+  padding: 0.75rem 1rem;
+  background: var(--panel);
+  border: none;
+}
+
+nav.menu a {
+  border-bottom: none;
+  color: var(--ash);
+}
+nav.menu a::before { content: "[ "; color: var(--mauve); }
+nav.menu a::after { content: " ]"; color: var(--mauve); }
+nav.menu a:hover,
+nav.menu a[aria-current="page"] {
+  color: var(--magenta);
+  text-shadow: var(--glow);
+}
+nav.menu a:hover { animation: jitter 220ms steps(2); }
+@keyframes jitter {
+  0%, 100% { transform: translate(0, 0); }
+  25% { transform: translate(-1px, 1px); }
+  50% { transform: translate(1px, -1px); }
+  75% { transform: translate(-1px, 0); }
+}
+
+main {
+  border: none;
+  border-top: 1px solid var(--mauve);
+  border-bottom: 1px solid var(--mauve);
+  background: rgba(22, 16, 31, 0.99);
+  padding: 2rem 1.5rem;
+}
+
+/* scrolling status line, teletext-style — decorative flavor text only.
+   sits between nav and main, so it owns the top border (nav has none)
+   and leaves its bottom to main's own top border. */
+.ticker {
+  overflow: hidden;
+  white-space: nowrap;
+  border: none;
+  border-top: 1px solid var(--mauve);
+  background: var(--panel);
+  font-size: 0.7rem;
+}
+.ticker-track {
+  display: inline-flex;
+  animation: ticker-scroll 26s linear infinite;
+}
+.ticker-track span {
+  color: var(--mauve);
+  padding: 0.3rem 0;
+}
+@keyframes ticker-scroll {
+  to { transform: translateX(-50%); }
+}
+
+footer.statusline {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  padding: 0.5rem 1rem;
+  border: none;
+  background: var(--panel);
+  color: var(--mauve);
+  font-size: 0.75rem;
+}
+
+.caret {
+  display: inline-block;
+  width: 0.6ch;
+  margin-left: 1px;
+  background: var(--magenta);
+  animation: blink 1s steps(1) infinite;
+}
+@keyframes blink { 50% { opacity: 0; } }
+
+/* panels: the recurring "targeting corner" motif used for every content block */
+.panel {
+  position: relative;
+  border: 1px solid var(--mauve);
+  background: var(--panel);
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.5rem;
+}
+.panel::before,
+.panel::after {
+  content: "";
+  position: absolute;
+  width: 10px;
+  height: 10px;
+}
+.panel::before {
+  top: -1px; left: -1px;
+  border-top: 2px solid var(--magenta);
+  border-left: 2px solid var(--magenta);
+}
+.panel::after {
+  bottom: -1px; right: -1px;
+  border-bottom: 2px solid var(--magenta);
+  border-right: 2px solid var(--magenta);
+}
+
+h1, h2, h3 {
+  color: var(--ash);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 700;
+}
+
+h1 { font-size: clamp(1.6rem, 5vw, 2.4rem); color: var(--violet); text-shadow: var(--glow); }
+h2 { font-size: 1.1rem; border-bottom: 1px solid var(--mauve); padding-bottom: 0.4rem; }
+
+.banner-wrap {
+  overflow-x: auto;
+  margin-bottom: 1rem;
+}
+.banner {
+  margin: 0;
+  color: var(--mauve);
+  font-size: 0.75rem;
+  line-height: 1.4;
+  text-shadow: 0 0 4px rgba(156, 122, 158, 0.5);
+}
+
+.lede {
+  color: var(--mauve);
+}
+
+.prompt::before {
+  content: "> ";
+  color: var(--magenta);
+}
+
+/* transmissions feed: one bordered log, entries as divided rows (newest first) */
+.log {
+  border: 1px solid var(--mauve);
+  background: var(--panel);
+}
+
+.signal {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.5rem;
+  border-bottom: 1px solid rgba(156, 122, 158, 0.35);
+  font-size: 0.75rem;
+  color: var(--mauve);
+  letter-spacing: 0.05em;
+}
+.signal-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--magenta);
+  box-shadow: 0 0 6px var(--magenta);
+  animation: blink 1.6s steps(1) infinite;
+}
+
+.entry {
+  padding: 1.1rem 1.5rem;
+  border-top: 1px solid rgba(156, 122, 158, 0.35);
+}
+.entry:first-child { border-top: none; }
+
+.entry-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 0.75rem;
+  margin-bottom: 0.4rem;
+}
+
+.entry-date {
+  color: var(--violet);
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
+.entry-subject {
+  color: var(--ash);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+/* scrambled / decrypting text, used on the transmissions page */
+.cipher {
+  cursor: help;
+  color: var(--mauve);
+  font-size: 0.95rem;
+  margin: 0;
+}
+.cipher[data-state="plain"] {
+  color: var(--ash);
+}
+
+button, select, input, textarea {
+  font-family: var(--mono);
+  font-size: 0.9rem;
+  color: var(--ash);
+  background: var(--void);
+  border: 1px solid var(--mauve);
+  padding: 0.5rem 0.6rem;
+}
+
+button {
+  color: var(--magenta);
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+button:hover { background: rgba(255, 46, 196, 0.08); }
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  margin-bottom: 1rem;
+}
+.field label {
+  font-size: 0.75rem;
+  color: var(--mauve);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+.row > .field { flex: 1 1 200px; }
+
+textarea { width: 100%; resize: vertical; min-height: 5rem; }
+
+.actions { display: flex; gap: 0.75rem; flex-wrap: wrap; margin: 0.5rem 0 1rem; }
+
+.note {
+  position: relative;
+  font-size: 0.8rem;
+  color: var(--mauve);
+  border: 1px dashed var(--violet);
+  padding: 0.75rem 1rem;
+  background: repeating-linear-gradient(
+    135deg,
+    rgba(255, 46, 196, 0.08) 0 10px,
+    transparent 10px 20px
+  );
+}
+
+/* webshell: a real scrollback pane with a live input line at the bottom.
+   darker than the surrounding panel so it reads as a screen within a screen. */
+.shell {
+  height: 62vh;
+  min-height: 20rem;
+  overflow-y: auto;
+  padding: 1rem;
+  border: 1px solid var(--mauve);
+  background: rgba(6, 4, 9, 0.94);
+  font-size: 0.82rem;
+  line-height: 1.5;
+  cursor: text;
+}
+
+.shell-line {
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+}
+
+.shell-ok { color: var(--magenta); }
+.shell-dim { color: var(--mauve); }
+.shell-err { color: var(--alert); }
+
+.shell-input-line {
+  display: flex;
+  align-items: baseline;
+  gap: 1ch;
+}
+.shell-input-line[hidden] { display: none; }
+
+.shell-prompt {
+  color: var(--magenta);
+  white-space: nowrap;
+}
+
+/* overrides the shared input styling — this one is a bare caret on a screen,
+   not a bordered form field. */
+.shell-input {
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--ash);
+  font: inherit;
+  outline: none;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+@media (max-width: 600px) {
+  main { padding: 1.5rem 1rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .caret,
+  .signal-dot,
+  .glitch::before,
+  .glitch::after,
+  nav.menu a:hover,
+  .ticker-track,
+  .crt-overlay,
+  .crt-overlay::after,
+  .crt-noise {
+    animation: none;
+  }
+  .glitch::before, .glitch::after { opacity: 0; }
+  .boot-flash { display: none; }
+}

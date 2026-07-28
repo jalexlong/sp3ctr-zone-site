@@ -1,0 +1,23 @@
+---
+layout: _layouts/base.njk
+section: transmissions
+description: Sealed transmissions from sp3ctr-zone. Hover or focus an entry to decrypt it.
+extraScripts:
+  - /js/transmissions.js
+---
+<h1>transmissions</h1>
+<p class="prompt">newest first. hover or tab to an entry to decrypt it —
+  step away and it reseals.</p>
+
+<div class="log">
+  <div class="signal"><span class="signal-dot" aria-hidden="true"></span> SIGNAL LOCKED &middot; {{ collections.transmissions.length }} TRANSMISSIONS ON FILE</div>
+{% for entry in collections.transmissions | reverse %}
+  <article class="entry">
+    <div class="entry-head">
+      <span class="entry-date">{{ entry.date | dateDisplay }}</span>
+      <span class="entry-subject">{{ entry.data.title }}</span>
+    </div>
+    <p class="cipher" tabindex="0" data-plain="{{ entry.data.message }}">[ sealed ]</p>
+  </article>
+{% endfor %}
+</div>

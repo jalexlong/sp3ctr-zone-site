@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>sp3ctr-zone :: {{ section }}</title>
+  <meta name="description" content="{{ description }}">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="alternate icon" href="/favicon.ico" sizes="16x16 32x32 48x48 64x64">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="boot-flash" aria-hidden="true"></div>
+  <div class="grid-floor" aria-hidden="true"></div>
+  <div class="crt-overlay" aria-hidden="true"></div>
+  <div class="crt-noise" aria-hidden="true"></div>
+
+  <div class="terminal">
+    <div class="titlebar">
+      <span class="glitch" data-text="sp3ctr-zone :: {{ section }}">sp3ctr-zone :: {{ section }}</span>
+      <span data-clock>00:00:00</span><span class="caret"></span>
+    </div>
+
+    <nav class="menu" aria-label="site">
+      <a href="/" {% if page.url == "/" %}aria-current="page"{% endif %}>index</a>
+      <a href="/transmissions/" {% if page.url == "/transmissions/" %}aria-current="page"{% endif %}>transmissions</a>
+      <a href="/tools/" {% if page.url == "/tools/" %}aria-current="page"{% endif %}>tools</a>
+      <a href="/webshell/" {% if page.url == "/webshell/" %}aria-current="page"{% endif %}>webshell</a>
+      <a href="/about/" {% if page.url == "/about/" %}aria-current="page"{% endif %}>about</a>
+    </nav>
+
+    <div class="ticker" aria-hidden="true">
+      <div class="ticker-track">
+        <span>CARRIER DETECTED &middot; ENCRYPTION NOMINAL &middot; NODE UPTIME STABLE &middot; TRUST NO CLEARNET &middot; SIGNAL PERSISTS &middot; </span>
+        <span>CARRIER DETECTED &middot; ENCRYPTION NOMINAL &middot; NODE UPTIME STABLE &middot; TRUST NO CLEARNET &middot; SIGNAL PERSISTS &middot; </span>
+      </div>
+    </div>
+
+    <main>
+      {{ content | safe }}
+    </main>
+
+    <footer class="statusline">
+      <span>STATUS: <span style="color:var(--magenta)">online</span></span>
+      <span>NODE: sp3ctr-zone</span>
+    </footer>
+  </div>
+
+  <script src="/js/site.js"></script>
+  {% for src in extraScripts %}
+  <script src="{{ src }}"></script>
+  {% endfor %}
+</body>
+</html>

@@ -1,0 +1,27 @@
+---
+layout: _layouts/base.njk
+section: webshell
+description: sp3ctr-zone webshell — a guest shell on this node, running entirely in your browser.
+extraScripts:
+  - /js/webshell.js
+---
+<h1>webshell</h1>
+<p class="prompt">a guest session on this node. it boots, it auto-logs-in, and
+  it drops you at a prompt — all of it in your browser, none of it on a server.
+  the filesystem is a JavaScript object; read <code>/js/webshell.js</code> and
+  you've read the whole machine.</p>
+
+<div class="shell" id="shell">
+  <div id="shell-output"></div>
+  <form class="shell-input-line" id="shell-form" hidden>
+    <label class="visually-hidden" for="shell-input">shell command</label>
+    <span class="shell-prompt" id="shell-prompt">guest@sp3ctr-zone:~$</span>
+    <input class="shell-input" id="shell-input" type="text" autocomplete="off"
+           autocapitalize="off" autocorrect="off" spellcheck="false">
+  </form>
+</div>
+
+<p class="note">the session is confined to <code>/home/guest</code>, the way a
+  chroot would confine it — anything resolving outside that gets
+  <code>ACCESS_DENIED</code>. nothing is written, nothing is stored, and
+  nothing leaves the page. start with <code>help</code>.</p>
