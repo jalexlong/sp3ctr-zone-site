@@ -1,7 +1,24 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <rect width="64" height="64" rx="10" fill="#0b0710"/>
-  <rect x="2.5" y="2.5" width="59" height="59" rx="8.5" fill="none" stroke="#ff2ec4" stroke-width="3"/>
-  <path d="M17 22 L28 32 L17 42" fill="none" stroke="#9a5cff" stroke-width="6"
-        stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M35 43 H48" fill="none" stroke="#9a5cff" stroke-width="6" stroke-linecap="round"/>
+  <defs>
+    <!-- a lit screen rather than a flat tile: brighter behind the prompt, falling off to the page void at the bezel -->
+    <radialGradient id="screen" cx="50%" cy="46%" r="72%">
+      <stop offset="0" stop-color="#191026"/>
+      <stop offset="1" stop-color="#0b0710"/>
+    </radialGradient>
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="2.4"/>
+    </filter>
+  </defs>
+
+  <rect width="64" height="64" rx="12" fill="url(#screen)"/>
+
+  <g fill="none" stroke="#ff2ec4" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+    <!-- the glow is the same prompt, blurred underneath itself — keeps the crisp edges on top -->
+    <g filter="url(#glow)" opacity="0.55">
+      <path d="M18.5 22 L29.5 32 L18.5 42"/>
+      <path d="M35.5 42 H45.5"/>
+    </g>
+    <path d="M18.5 22 L29.5 32 L18.5 42"/>
+    <path d="M35.5 42 H45.5"/>
+  </g>
 </svg>
