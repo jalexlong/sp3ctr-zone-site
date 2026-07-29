@@ -8,8 +8,8 @@
 #
 #   the API key      read from the one *.env file next to this script, if it
 #                    isn't already in the environment — so the key lives in a
-#                    gitignored file instead of your shell history, and that
-#                    file can be named for the site it opens: sp3ctr-zone.env.
+#                    gitignored file instead of your shell history. Any name
+#                    ending in .env will do: api-key.env.
 #   the tests        run before anything is built or uploaded. Nothing ships
 #                    from a red suite unless you say so out loud.
 #   the flags        passed straight through, no `npm run deploy --` dance.
@@ -66,11 +66,12 @@ step() { printf '\n\033[35m:: %s\033[0m\n' "$1"; }
 # is gitignored, and is the only place in the repo it should ever live. The file
 # is sourced as shell, so it wants plain KEY=value lines.
 #
-# Any name ending in .env will do, so it can say which site it opens rather than
-# being one more anonymous .env in a folder of them: sp3ctr-zone.env. That only
-# works while there's exactly one of them, though — with two, picking either is
-# a guess, and guessing which credentials to deploy with is how you end up
-# publishing one site over another. So it says so and stops.
+# Any name ending in .env will do, so it can say what it holds rather than being
+# one more anonymous dotfile: api-key.env. That only works while there's exactly
+# one of them, though — with two, picking either is a guess, and guessing which
+# credentials to deploy with is how you end up publishing one site over another.
+# So it says so and stops.
+sourced=""
 if [[ -z "${NEOCITIES_API_KEY:-}" ]]; then
   # nullglob so no match yields nothing rather than the literal pattern;
   # dotglob so a plain `.env` counts too, since * won't cross a leading dot.
@@ -92,23 +93,40 @@ if [[ -z "${NEOCITIES_API_KEY:-}" ]]; then
   fi
 
   if ((${#env_files[@]} == 1)); then
+    sourced="${env_files[0]}"
     set -a
     # shellcheck disable=SC1090
-    . "./${env_files[0]}"
+    . "./$sourced"
     set +a
   fi
 fi
 
+# Two different problems, and telling someone to create a file they're looking
+# at is no help at all: either there was nowhere to find a key, or there was a
+# file and it came back empty — a placeholder never filled in, or a line that
+# doesn't parse as KEY=value.
 if [[ -z "${NEOCITIES_API_KEY:-}" ]]; then
-  cat >&2 <<'MSG'
+  if [[ -n "$sourced" ]]; then
+    cat >&2 <<MSG
+$sourced doesn't set NEOCITIES_API_KEY to anything.
+
+It wants one plain line, no quotes, no spaces around the =:
+
+  NEOCITIES_API_KEY=your-key-here
+
+Get the key at neocities.org/settings -> your site -> API Key.
+MSG
+  else
+    cat >&2 <<'MSG'
 NEOCITIES_API_KEY isn't set.
 
 Get one at neocities.org/settings -> your site -> API Key, then either export it
 or drop it in an env file next to this script — any name ending in .env, and
 they're all gitignored:
 
-  echo 'NEOCITIES_API_KEY=...' > sp3ctr-zone.env
+  echo 'NEOCITIES_API_KEY=...' > api-key.env
 MSG
+  fi
   exit 1
 fi
 
