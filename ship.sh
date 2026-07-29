@@ -6,21 +6,22 @@
 # node deploy.mjs, which uploads _site/ to Neocities. What this adds is the
 # things you'd otherwise have to remember every time:
 #
-#   the API key      read from .env if it isn't already in the environment, so
-#                    the key lives in one gitignored file instead of your shell
-#                    history.
+#   the API key      read from the one *.env file next to this script, if it
+#                    isn't already in the environment — so the key lives in a
+#                    gitignored file instead of your shell history, and that
+#                    file can be named for the site it opens: sp3ctr-zone.env.
 #   the tests        run before anything is built or uploaded. Nothing ships
 #                    from a red suite unless you say so out loud.
 #   the flags        passed straight through, no `npm run deploy --` dance.
 #   a confirmation   before a real --prune, which is the one step here that
 #                    destroys anything.
 #
-#   ./deploy.sh                      test, build, upload
-#   ./deploy.sh --prune              …and delete remote files the build dropped
-#   ./deploy.sh --prune --dry-run    show what --prune would delete, change
-#                                    nothing
-#   ./deploy.sh --skip-tests         ship without running the suite
-#   ./deploy.sh --yes                don't ask before pruning
+#   ./ship.sh                      test, build, upload
+#   ./ship.sh --prune              …and delete remote files the build dropped
+#   ./ship.sh --prune --dry-run    show what --prune would delete, change
+#                                  nothing
+#   ./ship.sh --skip-tests         ship without running the suite
+#   ./ship.sh --yes                don't ask before pruning
 
 set -euo pipefail
 
@@ -61,14 +62,41 @@ done
 
 step() { printf '\n\033[35m:: %s\033[0m\n' "$1"; }
 
-# The key, from the environment or from .env — which is gitignored, and is the
-# only place in the repo it should ever live. .env is sourced as shell, so it
-# wants plain KEY=value lines.
-if [[ -z "${NEOCITIES_API_KEY:-}" && -f .env ]]; then
-  set -a
-  # shellcheck disable=SC1091
-  . ./.env
-  set +a
+# The key, from the environment or from an env file beside this script — which
+# is gitignored, and is the only place in the repo it should ever live. The file
+# is sourced as shell, so it wants plain KEY=value lines.
+#
+# Any name ending in .env will do, so it can say which site it opens rather than
+# being one more anonymous .env in a folder of them: sp3ctr-zone.env. That only
+# works while there's exactly one of them, though — with two, picking either is
+# a guess, and guessing which credentials to deploy with is how you end up
+# publishing one site over another. So it says so and stops.
+if [[ -z "${NEOCITIES_API_KEY:-}" ]]; then
+  # nullglob so no match yields nothing rather than the literal pattern;
+  # dotglob so a plain `.env` counts too, since * won't cross a leading dot.
+  shopt -s nullglob dotglob
+  env_files=()
+  for candidate in *.env; do
+    [[ -f "$candidate" ]] && env_files+=("$candidate")
+  done
+  shopt -u nullglob dotglob
+
+  if ((${#env_files[@]} > 1)); then
+    {
+      echo "more than one env file here, and no way to tell which holds the key:"
+      printf '  %s\n' "${env_files[@]}"
+      echo
+      echo "Keep one, or export NEOCITIES_API_KEY yourself and this is skipped."
+    } >&2
+    exit 1
+  fi
+
+  if ((${#env_files[@]} == 1)); then
+    set -a
+    # shellcheck disable=SC1090
+    . "./${env_files[0]}"
+    set +a
+  fi
 fi
 
 if [[ -z "${NEOCITIES_API_KEY:-}" ]]; then
@@ -76,9 +104,10 @@ if [[ -z "${NEOCITIES_API_KEY:-}" ]]; then
 NEOCITIES_API_KEY isn't set.
 
 Get one at neocities.org/settings -> your site -> API Key, then either export it
-or drop it in a .env file next to this script (gitignored):
+or drop it in an env file next to this script — any name ending in .env, and
+they're all gitignored:
 
-  echo 'NEOCITIES_API_KEY=...' > .env
+  echo 'NEOCITIES_API_KEY=...' > sp3ctr-zone.env
 MSG
   exit 1
 fi
@@ -115,3 +144,4 @@ npm run build
 
 step "deploy"
 node deploy.mjs ${prune:+"$prune"} ${dry_run:+"$dry_run"}
+
