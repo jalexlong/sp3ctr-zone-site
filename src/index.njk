@@ -37,3 +37,54 @@ permalink: /
     around the filesystem; some of it isn't listed.</p>
   <p><a href="/about/">about</a> — who's running this thing, and why.</p>
 </div>
+
+{# 88x31 buttons. The lists come from src/_data/buttons.js — add one there, not
+   here. Every button carries explicit width and height so the wall doesn't
+   reflow as the GIFs arrive, and loading="lazy" because this is the last thing
+   on the page and none of it is worth delaying the text above it. #}
+{% macro wall(items, empty) %}
+  {% if items.length %}
+  <ul class="button-wall">
+    {% for button in items %}
+    <li>
+      {% if button.href %}
+      <a href="{{ button.href }}" rel="noopener">
+        <img src="/buttons/{{ button.file }}" width="88" height="31" alt="{{ button.alt }}" loading="lazy">
+      </a>
+      {% else %}
+      <img src="/buttons/{{ button.file }}" width="88" height="31" alt="{{ button.alt }}" loading="lazy">
+      {% endif %}
+      {% if button.note %}<span class="button-note">{{ button.note }}</span>{% endif %}
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p class="wall-empty">{{ empty }}</p>
+  {% endif %}
+{% endmacro %}
+
+<div class="panel" id="buttons">
+  <h2>buttons</h2>
+  <p class="prompt">eighty-eight by thirty-one pixels, the old web's unit of
+    saying hello. no ring, no ranking, no javascript counting the clicks —
+    just links, kept by hand.</p>
+
+  <h3 class="wall-head">take one</h3>
+  {{ wall(buttons.mine) }}
+  <p>help yourself — and take the still one if your page is somewhere motion
+    isn't welcome. either way, <strong>save the file</strong> rather than
+    pointing at mine: this node stays up, but a copy on your own server is one
+    fewer thing that can go dark on you, and one fewer request that tells me
+    who's reading your page.</p>
+  <pre class="embed"><code>{{ buttons.embed }}</code></pre>
+
+  <h3 class="wall-head">badges</h3>
+  {{ wall(buttons.badges) }}
+  <p>these don't link anywhere. take them if you mean them.</p>
+
+  <h3 class="wall-head">friends of the node</h3>
+  {{ wall(buttons.friends, "// nobody on file yet. if we've spoken, send me yours.") }}
+
+  <h3 class="wall-head">found in the wild</h3>
+  {{ wall(buttons.collected, "// nothing on file yet.") }}
+</div>

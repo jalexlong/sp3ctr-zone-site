@@ -613,6 +613,98 @@ html[data-js] [data-seal]:not([data-state]) { visibility: hidden; }
 }
 .transmission-body p:first-child { margin-top: 0; }
 
+/* the button wall: 88x31s, at 88x31.
+   ------------------------------------------------------------------------- */
+
+/* A subhead inside a panel, below h2 rather than beside it. Scoped to this
+   class instead of styling h3 globally: the bare h3 in this stylesheet inherits
+   the browser's 1.17em, which is *larger* than h2's 1.1rem, and untangling that
+   would restyle every transmission body on the site. Not this change's fight. */
+.wall-head {
+  margin: 1.75rem 0 0.6rem;
+  font-size: 0.8rem;
+  color: var(--mauve);
+  border-bottom: none;
+  padding-bottom: 0;
+}
+.wall-head::before { content: "// "; color: var(--magenta); }
+
+.button-wall {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* Pinned to the width of what it holds, which is the point of the whole form.
+   Without the width, a cell is as wide as its caption instead of its button:
+   "animated" and "no motion" sat on one baseline with 9px between them and read
+   as a single run-on sentence, with the buttons above them drifting apart to
+   match. Now the caption wraps inside the button's own 88px column. */
+.button-wall li {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  width: 88px;
+}
+
+/* The one rule the whole section exists to get right.
+   `width`/`height` are restated here so a button is 88x31 even if its file
+   isn't — a collected GIF that turns out to be 90x33 gets held to the grid
+   rather than pushing its neighbours around.
+   `image-rendering: pixelated` is what keeps these legible: every one of them
+   is hand-placed pixels at a 5px x-height, and a browser that resamples them
+   smoothly — which it will, on any fractional zoom or hidpi screen — turns the
+   lettering to grey soup. Nearest-neighbour is not a stylistic choice here, it's
+   the difference between reading the word and not. */
+.button-wall img {
+  display: block;
+  width: 88px;
+  height: 31px;
+  image-rendering: pixelated;
+}
+
+/* Buttons have their own borders drawn into the pixels, so the anchor adds
+   none of its own — no dotted underline, no baseline gap under the image. */
+.button-wall a {
+  display: block;
+  border-bottom: none;
+  line-height: 0;
+}
+.button-wall a:hover img,
+.button-wall a:focus-visible img {
+  box-shadow: 0 0 10px rgba(255, 46, 196, 0.75);
+}
+
+.button-note,
+.wall-empty {
+  font-size: 0.7rem;
+  color: var(--mauve);
+  letter-spacing: 0.04em;
+}
+
+.wall-empty { margin: 0; }
+
+/* The copy-paste snippet. `pre-wrap` rather than a horizontal scrollbar: a soft
+   wrap is a display decision the browser makes and doesn't put in the
+   clipboard, so the line still arrives at its destination in one piece while
+   staying entirely visible here. The alternative — `pre` plus overflow-x —
+   hides half the markup behind a scrollbar on exactly the narrow screens where
+   someone is least likely to notice there's more of it. */
+.embed {
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  margin: 0.75rem 0 0;
+  padding: 0.6rem 0.75rem;
+  border: 1px dashed var(--violet);
+  background: rgba(6, 4, 9, 0.6);
+  color: var(--ash);
+  font-size: 0.7rem;
+  line-height: 1.5;
+}
+
 button, select, input, textarea {
   font-family: var(--mono);
   font-size: 0.9rem;
