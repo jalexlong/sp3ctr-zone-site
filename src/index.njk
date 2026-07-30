@@ -69,14 +69,29 @@ permalink: /
     saying hello. no ring, no ranking, no javascript counting the clicks —
     just links, kept by hand.</p>
 
-  <h3 class="wall-head">take one</h3>
+  <h3 class="wall-head">link here</h3>
   {{ wall(buttons.mine) }}
-  <p>help yourself — and take the still one if your page is somewhere motion
-    isn't welcome. either way, <strong>save the file</strong> rather than
-    pointing at mine: this node stays up, but a copy on your own server is one
-    fewer thing that can go dark on you, and one fewer request that tells me
-    who's reading your page.</p>
+  <p>if you want to link to this node, please do — no permission needed, no
+    reciprocal link expected, nothing to join. take the animated one, or the
+    still one if your page is somewhere motion isn't welcome.</p>
+
+  <ol class="steps">
+    <li><strong>download the gif.</strong> right-click and save it, or
+      <code>curl -O {{ buttons.origin }}/buttons/{{ buttons.hero }}</code></li>
+    <li><strong>upload it to your own site</strong>, wherever you keep
+      images.</li>
+    <li><strong>paste this</strong>, with <code>src</code> pointing at your
+      copy — not at mine:</li>
+  </ol>
   <pre class="embed"><code>{{ buttons.embed }}</code></pre>
+
+  <p>that third step is the one people skip, so: <strong>please don't hotlink
+    it.</strong> pointing <code>src</code> back here means every visitor to
+    your page fetches the button off my server — it spends my bandwidth to
+    render your site, it breaks the day i reorganise a directory, and it hands
+    me a log line for every one of your readers, which is nobody's business but
+    theirs. an 88x31 is under 18 kilobytes. keep your own copy; that's the
+    whole etiquette of the form.</p>
 
   <h3 class="wall-head">badges</h3>
   {{ wall(buttons.badges) }}

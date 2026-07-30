@@ -687,6 +687,38 @@ html[data-js] [data-seal]:not([data-state]) { visibility: hidden; }
 
 .wall-empty { margin: 0; }
 
+/* The three steps for taking a button. Numbered by hand in magenta rather than
+   with the browser's list-style, so the digits are an accent in the site's own
+   palette instead of body-coloured text sitting outside the content box — and
+   so the marker can't drift out of the panel's padding on a narrow screen. */
+.steps {
+  list-style: none;
+  margin: 0.75rem 0;
+  padding: 0;
+  counter-reset: step;
+}
+.steps li {
+  position: relative;
+  margin-bottom: 0.5rem;
+  padding-left: 2rem;
+}
+.steps li::before {
+  counter-increment: step;
+  content: counter(step) ".";
+  position: absolute;
+  left: 0;
+  color: var(--magenta);
+}
+
+/* Inline code inside prose. The whole page is already monospace, so this only
+   has to distinguish a literal from the sentence around it — a colour shift
+   does that without the boxed-and-padded look, which at this font size would
+   break the line rhythm for the sake of a filename. */
+code {
+  color: var(--violet);
+  overflow-wrap: break-word;
+}
+
 /* The copy-paste snippet. `pre-wrap` rather than a horizontal scrollbar: a soft
    wrap is a display decision the browser makes and doesn't put in the
    clipboard, so the line still arrives at its destination in one piece while
@@ -704,6 +736,11 @@ html[data-js] [data-seal]:not([data-state]) { visibility: hidden; }
   font-size: 0.7rem;
   line-height: 1.5;
 }
+
+/* The snippet is a whole block of literal, not a literal inside a sentence, so
+   it opts out of the violet above — at this size a full block of it is a real
+   drop in contrast, and there's no surrounding prose for it to stand out from. */
+.embed code { color: inherit; }
 
 button, select, input, textarea {
   font-family: var(--mono);

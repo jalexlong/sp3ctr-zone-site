@@ -25,19 +25,16 @@
 // a broken-image box get, and `href` is optional — leave it off for a button
 // that's a statement rather than a door.
 
-// The canonical origin, used to build the copy-paste snippet a visitor takes
-// away. It has to be absolute: the whole point is that the markup works on
-// somebody else's site, where "/buttons/…" would resolve to their server.
-//
-// CHECK THIS ONE. It's the Neocities default for this site's name, which is a
-// guess — nothing else in the repo records the live hostname. If the site
-// answers on a custom domain, this is the only line that needs to change.
+// The canonical origin — the live hostname, confirmed. Used for the link target
+// in the copy-paste snippet and for the download command next to it, so it's
+// stated once here and nowhere else.
 const ORIGIN = "https://sp3ctr-zone.neocities.org";
 
 const HERO = "sp3ctr-zone.gif";
 
 module.exports = {
   origin: ORIGIN,
+  hero: HERO,
 
   // The two versions of this site's own link button. Same wordmark, and the
   // still is a real alternative rather than a fallback — see make-buttons.py.
@@ -76,12 +73,23 @@ module.exports = {
   //   { file: "somewhere.gif", href: "https://somewhere.example/", alt: "somewhere" },
   collected: [],
 
-  // What a visitor copies. Absolute URLs on both the link and the image, and
-  // width/height spelled out so the button doesn't reflow their page while it
-  // loads. Built here rather than written into the template so the origin above
-  // is stated exactly once.
+  // What a visitor copies. The two URLs in it are deliberately different kinds,
+  // and that asymmetry is the whole point of the snippet:
+  //
+  //   href  absolute, to this site. It's a link here; it has to resolve from
+  //         wherever they are.
+  //   src   a bare filename, pointing at *their* copy of the GIF sitting next to
+  //         their page. Not this server.
+  //
+  // The src used to be absolute too, which quietly made the snippet do the exact
+  // thing the paragraph above it tells people not to: every visitor to their page
+  // fetched the button from here. A visitor who follows instructions shouldn't end
+  // up hotlinking because the example did.
+  //
+  // width/height are spelled out so the button doesn't reflow their page as it
+  // loads — the same reason the wall itself sets them.
   embed:
     `<a href="${ORIGIN}/">` +
-    `<img src="${ORIGIN}/buttons/${HERO}" width="88" height="31" alt="sp3ctr-zone">` +
+    `<img src="${HERO}" width="88" height="31" alt="sp3ctr-zone">` +
     `</a>`,
 };
