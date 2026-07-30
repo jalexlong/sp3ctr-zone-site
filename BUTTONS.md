@@ -38,7 +38,9 @@ at the top of the script.
 Nothing is added to `package.json`: wiring this into `npm run build` would put a
 Python and Pillow requirement on anyone who just wants to build the site.
 
-It rewrites all of `buttons/` every run and prints what it wrote:
+It rewrites the buttons it owns and prints what it wrote. Files it doesn't know
+about — friends' and collected buttons, which live in the same directory — are
+left alone, so a regeneration is safe to run at any time:
 
 ```
 88x31 foundry

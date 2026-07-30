@@ -64,10 +64,25 @@ module.exports = {
   ],
 
   // Sites run by people I actually know. An empty wall is more honest than a
-  // padded one, so this stays empty until there's something real on it.
+  // padded one, so nothing goes here that isn't real.
   //
   //   { file: "their-button.gif", href: "https://example.org/", alt: "example" },
-  friends: [],
+  //
+  // TODO — freeze's four are badges, not link buttons: they say things about
+  // coffee rather than naming his site. His actual name button is pending the
+  // rename, and when it lands it should go at the top of this list, with these
+  // four following it.
+  //
+  // TODO — the href below is his PRE-RENAME address and it currently 404s. Do
+  // not ship this list until either the rename has happened and this is updated,
+  // or the old address is answering. Four dead links on the index page is worse
+  // than four buttons that aren't on it yet.
+  friends: [
+    { file: "but-first-coffee.gif", href: "https://freezes-place.neocities.org/", alt: "but first, coffee" },
+    { file: "death-before-decaf.gif", href: "https://freezes-place.neocities.org/", alt: "death before decaf" },
+    { file: "powered-by-caffeine.gif", href: "https://freezes-place.neocities.org/", alt: "powered by caffeine" },
+    { file: "hand-brewed.gif", href: "https://freezes-place.neocities.org/", alt: "hand brewed" },
+  ],
 
   // Buttons picked up around the web. Same rule as above: the file is saved into
   // buttons/, and `href` goes to the site it belongs to — a button is a link
