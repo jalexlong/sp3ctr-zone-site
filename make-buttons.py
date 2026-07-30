@@ -6,6 +6,11 @@
 Writes every GIF in buttons/ from scratch. Nothing in that directory is hand
 edited — if a button looks wrong, it's wrong here.
 
+BUTTONS.md is the workflow around this file: adding a badge, hanging someone
+else's button on the wall, the measured character limits, and what to change to
+point this generator at a different site. This docstring is why the code is
+shaped the way it is; that document is how to use it.
+
 WHY A SCRIPT AND NOT A DRAWING
 
 88x31 is small enough that every pixel is a decision, and a decision made in a
@@ -72,6 +77,13 @@ KANA = ImageFont.truetype(KANA_FONT, 9)
 # ones (ｵ ｸ ｿ) turn to mush at 9px; these keep a readable silhouette, which is
 # the whole reason to use kana instead of random punctuation.
 GLYPHS = "ｱｲｴｶｷｹｺｻｼｽﾆﾈﾊﾋﾎﾏﾐﾑﾔﾜﾝ7031"
+
+# The name on the hero button. Named up here rather than inlined because it's the
+# one thing that changes if this generator is ever pointed at another site — see
+# BUTTONS.md. Thirteen characters is the ceiling at this font size; hero_frames
+# checks rather than trusting it.
+WORDMARK = "sp3ctr-zone"
+WORDMARK_MARGIN = 3
 
 
 # --- drawing helpers -------------------------------------------------------
@@ -303,8 +315,20 @@ def hero_frames():
     # rasterising each one on demand would dominate the runtime for no reason.
     masks = {g: ink(g, KANA) for g in GLYPHS}
 
-    title = ink("sp3ctr-zone", TITLE)
+    title = ink(WORDMARK, TITLE)
     title_xy = centered(title, (1, 1, W - 2, H - 2))
+
+    # A longer name doesn't wrap or shrink, it just runs under the bezel and out
+    # the side of the button, and it does it quietly — the rain is busy enough
+    # that a clipped final letter reads as part of the picture. Caught here
+    # instead, because the wordmark is precisely what a reuse of this generator
+    # changes, and 88px stops being generous somewhere around fourteen
+    # characters.
+    assert title_xy[0] >= WORDMARK_MARGIN, (
+        f"{WORDMARK!r} sets {title.width}px wide, which leaves {title_xy[0]}px "
+        f"inside the bezel — want {WORDMARK_MARGIN}px. "
+        f"{(W - 2 * WORDMARK_MARGIN) // 6}ish characters is the ceiling at this size."
+    )
 
     # Where the rain gets knocked back so magenta-on-violet stays readable.
     #

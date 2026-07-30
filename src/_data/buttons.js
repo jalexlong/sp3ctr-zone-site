@@ -21,6 +21,9 @@
 //     everything else: hold your own files.
 //  2. Add a line to the right list below.
 //
+// BUTTONS.md at the repo root has the longer version of this, plus how to make a
+// button rather than hang one.
+//
 // Fields: `file` is the name inside buttons/, `alt` is what a screen reader and
 // a broken-image box get, and `href` is optional — leave it off for a button
 // that's a statement rather than a door.
