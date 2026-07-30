@@ -429,17 +429,40 @@ BADGES = [
         """,
     },
     {
-        "name": "no-ai-training",
-        "lines": ("NO AI", "TRAINING"),
+        # A shield, where this badge used to carry the circle-slash it inherited
+        # from "NO AI TRAINING". The glyph was right there and wrong here: ∅ is a
+        # negation, it earned its place by reinforcing that badge's "NO", and left
+        # of an affirmative claim it argues with the words — scanned left to right,
+        # "∅ | PRIVACY" can be read as "no privacy", which is the opposite of the
+        # point. A shield says protected instead of forbidden.
+        #
+        # Solid, like the padlock, for the reason given at the top of BADGES —
+        # anything inside it, a keyhole or a tick, is mush at eleven pixels.
+        #
+        # What makes it read as a shield rather than a heart is the flat
+        # full-width top. The first draft inset the shoulders by a pixel and
+        # tapered all the way to a single-pixel point, and between that and the
+        # scanlines crossing it the whole sprite rounded off and read as a heart —
+        # or a spade, depending on who was looking. Square shoulders and a blunt
+        # three-pixel base fixed it without changing the size.
+        #
+        # Broken after "PRIVACY" rather than after "IS": both splits measure 41px
+        # and 59px, so the choice is only about where the sentence bends, and
+        # subject-then-predicate reads as two thoughts where "PRIVACY IS / A RIGHT"
+        # reads as one thought interrupted.
+        "name": "privacy-is-a-right",
+        "lines": ("PRIVACY", "IS A RIGHT"),
         "icon": """
-        ..#####..
-        .##...###
-        ##...##.#
-        ##..##..#
-        #..##...#
-        #.##...##
-        ###...##.
-        .#####...
+        ###########
+        ###########
+        ###########
+        ###########
+        ###########
+        ###########
+        .#########.
+        ..#######..
+        ...#####...
+        ....###....
         """,
     },
     {

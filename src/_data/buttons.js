@@ -59,7 +59,7 @@ module.exports = {
     { file: "trust-but-verify.gif", alt: "trust but verify" },
     { file: "view-source.gif", alt: "view source" },
     { file: "encrypt-everything.gif", alt: "encrypt everything" },
-    { file: "no-ai-training.gif", alt: "no AI training" },
+    { file: "privacy-is-a-right.gif", alt: "privacy is a right" },
     { file: "they-cant-stop-us-all.gif", alt: "can't stop us all" },
   ],
 
